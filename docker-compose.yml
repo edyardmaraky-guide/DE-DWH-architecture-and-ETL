@@ -1,0 +1,173 @@
+version: '3.8'
+
+services:
+  oltp_db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: oltp
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./sql/oltp_init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - airflow_network
+
+  dwh_db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./sql/dwh_init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - airflow_network
+
+  # airflow:
+  #   image: apache/airflow:3.1.6
+  #   container_name: airflow
+  #   environment:
+  #     - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+  #     - AIRFLOW__CORE__LOAD_EXAMPLES=False
+  #     - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+  #     - AIRFLOW__WEBSERVER__SECRET_KEY=your_secret_key_here
+  #     - AIRFLOW__API__SECRET_KEY=your_secret_key_here
+  #     # Правильная переменная для миграции БД
+  #     - _AIRFLOW_DB_MIGRATE=true
+  #     # Переменные для создания пользователя в новой системе аутентификации
+  #     - _AIRFLOW_WWW_USER_CREATE=true
+  #     - _AIRFLOW_WWW_USER_USERNAME=admin
+  #     - _AIRFLOW_WWW_USER_PASSWORD=admin
+  #     # Явно указываем auth manager
+  #     - AIRFLOW__AUTH__AUTH_MANAGER=simple_auth_manager
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - ./dags:/opt/airflow/dags
+  #     - ./logs:/opt/airflow/logs
+  #     - ./plugins:/opt/airflow/plugins
+  #     - ./scripts:/opt/airflow/scripts
+  #     - airflow_data:/opt/airflow
+  #   command: >
+  #     bash -c "
+  #     airflow db migrate &&
+  #     airflow scheduler &
+  #     airflow api-server
+  #     "
+  #   depends_on:
+  #     - oltp_db
+  #     - dwh_db
+  #   networks:
+  #     - airflow_network
+
+  # postgres:
+  #   image: postgres:16
+  #   environment:
+  #     POSTGRES_USER: airflow
+  #     POSTGRES_PASSWORD: airflow
+  #     POSTGRES_DB: airflow
+  #   volumes:
+  #     - postgres-db-volume:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD", "pg_isready", "-U", "airflow"]
+  #     interval: 10s
+  #     retries: 5
+  #     start_period: 5s
+  #   restart: always
+
+    
+  # airflow-scheduler:
+  #   image: apache/airflow:3.1.6
+  #   container_name: airflow-scheduler
+  #   environment:
+  #     - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+  #     - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////opt/airflow/airflow.db
+  #     - AIRFLOW__WEBSERVER__SECRET_KEY=your_secret_key_here
+  #     - AIRFLOW__API__SECRET_KEY=your_secret_key_here
+  #     - AIRFLOW__AUTH__AUTH_MANAGER=simple_auth_manager
+  #   volumes:
+  #     - ./dags:/opt/airflow/dags
+  #     - ./logs:/opt/airflow/logs
+  #     - ./plugins:/opt/airflow/plugins
+  #     - ./scripts:/opt/airflow/scripts
+  #     - airflow_data:/opt/airflow
+  #   command: scheduler
+  #   depends_on:
+  #     - airflow
+  #     - oltp_db
+  #     - dwh_db
+  #   networks:
+  #     - airflow_network
+
+  airflow-postgres:
+    image: postgres:15
+    container_name: airflow-postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - airflow_pg:/var/lib/postgresql/data
+    networks:
+      - airflow_network
+
+  airflow:
+    image: apache/airflow:3.1.6
+    container_name: airflow
+    depends_on:
+      - airflow-postgres
+      - oltp_db
+      - dwh_db
+    environment:
+      - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
+      - AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL=10
+      # Core
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+
+      # DB (ВАЖНО)
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@airflow-postgres:5432/airflow
+
+      # Auth
+      - AIRFLOW__AUTH__AUTH_MANAGER=simple_auth_manager
+
+      # API / UI
+      - AIRFLOW__WEBSERVER__SECRET_KEY=supersecret
+      - AIRFLOW__API__SECRET_KEY=supersecret
+
+      # Init
+      - _AIRFLOW_DB_MIGRATE=true
+
+    ports:
+      - "8080:8080"
+
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - ./scripts:/opt/airflow/scripts
+
+    command: >
+      bash -c "
+      airflow db migrate &&
+      airflow dag-processor &
+      airflow scheduler & 
+      airflow api-server
+      "
+
+    networks:
+      - airflow_network
+
+volumes:
+  oltp_data:
+  dwh_data:
+  airflow_pg:
+  # airflow_data:
+  # postgres-db-volume:
+
+networks:
+  airflow_network:
+    driver: bridge
