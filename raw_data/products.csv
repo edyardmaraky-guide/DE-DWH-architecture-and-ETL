@@ -1,0 +1,54 @@
+Product_ID,Product_Name,Category,Supplier_ID,Cost_Price
+P001,Widget A,Electronics,S001,15.0
+P002,Gadget B,Home Appliances,S002,25.0
+P003,Tool C,Hardware,S003,10.0
+P004,Accessory D,Accessories,S004,5.0
+P005,Device E,Electronics,S005,30.0
+P006,Item F,Office Supplies,S006,12.5
+P007,Appliance G,Home Appliances,S007,45.0
+P008,Widget H,Electronics,S008,20.0
+P009,Tool I,Hardware,S009,18.0
+P010,Accessory J,Accessories,S010,7.5
+P011,Widget K,Electronics,S001,16.0
+P012,Gadget L,Home Appliances,S002,22.0
+P013,Tool M,Hardware,S003,11.5
+P014,Accessory N,Accessories,S004,6.0
+P015,Device O,Electronics,S005,35.0
+P016,Item P,Office Supplies,S006,13.0
+P017,Appliance Q,Home Appliances,S007,40.0
+P018,Widget R,Electronics,S008,21.5
+P019,Tool S,Hardware,S009,19.0
+P020,Accessory T,Accessories,S010,8.5
+P021,Widget U,Electronics,S001,17.0
+P022,Gadget V,Home Appliances,S002,27.0
+P023,Tool W,Hardware,S003,12.0
+P024,Accessory X,Accessories,S004,5.5
+P025,Device Y,Electronics,S005,32.5
+P026,Item Z,Office Supplies,S006,11.0
+P027,Appliance AA,Home Appliances,S007,42.5
+P028,Widget AB,Electronics,S008,23.0
+P029,Tool AC,Hardware,S009,20.0
+P030,Accessory AD,Accessories,S010,9.0
+P031,Widget AE,Electronics,S001,18.5
+P032,Gadget AF,Home Appliances,S002,24.0
+P033,Tool AG,Hardware,S003,10.5
+P034,Accessory AH,Accessories,S004,4.75
+P035,Device AI,Electronics,S005,31.5
+P036,Item AJ,Office Supplies,S006,13.25
+P037,Appliance AK,Home Appliances,S007,44.0
+P038,Widget AL,Electronics,S008,19.5
+P039,Tool AM,Hardware,S009,17.5
+P040,Accessory AN,Accessories,S010,6.5
+P041,Widget AO,Electronics,S001,16.75
+P042,Gadget AP,Home Appliances,S002,26.5
+P043,Tool AQ,Hardware,S003,14.0
+P044,Accessory AR,Accessories,S004,5.25
+P045,Device AS,Electronics,S005,29.75
+P046,Item AT,Office Supplies,S006,12.75
+P047,Appliance AU,Home Appliances,S007,41.25
+P048,Widget AV,Electronics,S008,22.25
+P049,Tool AW,Hardware,S009,19.75
+P050,Accessory AX,Accessories,S010,8.75
+P051,Widget AY,Electronics,S001,15.75
+P052,Gadget AZ,Home Appliances,S002,23.75
+P053,Tool BA,Hardware,S003,11.25

@@ -1,0 +1,151 @@
+Customer_ID,Name,Age,Gender,Region
+C001,Jack Allen,28,F,West Coast
+C002,Xander Jones,66,F,Midwest
+C003,Tina Parker,65,F,West Coast
+C004,Paul Green,45,M,North
+C005,Quinn Adams,69,M,West Coast
+C006,Grace Hall,56,F,East Coast
+C007,Emily Adams,62,F,West Coast
+C008,Mia Allen,61,M,East Coast
+C009,Tina Brown,40,M,East Coast
+C010,Grace White,37,F,East Coast
+C011,Frank Wright,55,M,North
+C012,Frank Young,23,F,South
+C013,Victor Baker,70,F,Midwest
+C014,Dan Clark,43,M,East Coast
+C015,Henry Parker,70,F,South
+C016,Uma Jones,66,F,East Coast
+C017,Mia Brown,55,M,West Coast
+C018,Emily Walker,68,F,East Coast
+C019,Alice Hall,35,F,Midwest
+C020,Zoe Adams,19,F,Midwest
+C021,Grace Brown,51,F,South
+C022,Nina Taylor,60,F,South
+C023,Uma Hall,65,M,North
+C024,Nina Baker,54,F,East Coast
+C025,Sam Smith,37,M,Midwest
+C026,Nina Allen,24,M,South
+C027,Sam Wright,68,M,South
+C028,Oscar Green,24,M,South
+C029,Quinn Taylor,38,M,West Coast
+C030,Leo Carter,54,M,East Coast
+C031,Dan White,29,F,Midwest
+C032,Bob Allen,34,F,North
+C033,Grace Mitchell,54,M,West Coast
+C034,Alice King,23,F,East Coast
+C035,Jack Hill,41,M,East Coast
+C036,Uma Brown,39,M,North
+C037,Dan White,21,F,Midwest
+C038,Wendy Allen,63,F,South
+C039,Quinn Hall,43,M,East Coast
+C040,Frank White,53,M,South
+C041,Carol Jones,40,F,West Coast
+C042,Quinn Adams,24,F,North
+C043,Uma Mitchell,46,M,South
+C044,Oscar Adams,21,F,South
+C045,Leo Green,52,F,Midwest
+C046,Mia Jones,56,M,East Coast
+C047,Leo Young,53,M,South
+C048,Yara Walker,21,M,North
+C049,Victor Brown,48,M,Midwest
+C050,Emily Lee,70,M,East Coast
+C051,Yara Young,66,M,West Coast
+C052,Jack Allen,31,M,North
+C053,Emily Young,68,M,North
+C054,Alice Allen,62,F,Midwest
+C055,Yara Walker,58,F,Midwest
+C056,Carol Lee,20,F,Midwest
+C057,Sam Hall,51,M,North
+C058,Zoe Carter,51,M,West Coast
+C059,Yara Lee,36,M,North
+C060,Alice Adams,38,M,East Coast
+C061,Paul Young,62,M,Midwest
+C062,Henry Parker,68,M,West Coast
+C063,Karen Wright,26,M,West Coast
+C064,Frank Clark,32,M,South
+C065,Quinn Hall,64,M,East Coast
+C066,Sam Brown,32,M,South
+C067,Rachel Hill,61,M,East Coast
+C068,Rachel Hill,51,M,South
+C069,Rachel Brown,44,F,West Coast
+C070,Nina Lee,33,F,Midwest
+C071,Paul Lee,19,F,West Coast
+C072,Carol Brown,37,M,West Coast
+C073,Mia Allen,36,M,East Coast
+C074,Carol Parker,32,M,South
+C075,Frank Parker,50,M,East Coast
+C076,Grace White,51,M,West Coast
+C077,Frank Young,38,F,South
+C078,Alice Hill,64,M,North
+C079,Dan Walker,23,F,Midwest
+C080,Bob Allen,58,M,East Coast
+C081,Jack Young,59,M,South
+C082,Quinn Lee,34,M,South
+C083,Emily Brown,44,M,East Coast
+C084,Frank Brown,36,M,East Coast
+C085,Rachel Green,20,F,North
+C086,Emily King,31,F,Midwest
+C087,Nina Young,52,F,East Coast
+C088,Emily Adams,59,F,East Coast
+C089,Tina Clark,43,F,North
+C090,Carol Brown,41,M,North
+C091,Uma Lee,67,F,Midwest
+C092,Xander Walker,54,F,North
+C093,Rachel Taylor,32,M,Midwest
+C094,Dan Lee,18,F,West Coast
+C095,Tina Taylor,52,F,South
+C096,Quinn Hall,59,F,South
+C097,Henry Parker,18,F,North
+C098,Henry Hall,60,F,Midwest
+C099,Rachel Lee,67,F,West Coast
+C100,Paul Wright,68,M,East Coast
+C101,Karen Hill,69,F,East Coast
+C102,Isla Walker,38,F,South
+C103,Tina Allen,23,F,West Coast
+C104,Bob Young,48,F,West Coast
+C105,Tina Young,52,F,West Coast
+C106,Emily Green,61,M,North
+C107,Jack Hall,68,F,Midwest
+C108,Emily Taylor,21,M,South
+C109,Oscar Clark,62,F,South
+C110,Zoe Young,55,M,West Coast
+C111,Grace Walker,21,F,Midwest
+C112,Frank White,52,F,East Coast
+C113,Paul Brown,64,F,South
+C114,Nina Carter,59,F,East Coast
+C115,Bob Parker,25,M,West Coast
+C116,Carol Baker,62,M,Midwest
+C117,Isla Walker,44,M,South
+C118,Jack Adams,53,M,Midwest
+C119,Zoe Hill,41,F,Midwest
+C120,Leo Brown,70,F,West Coast
+C121,Leo Carter,65,M,Midwest
+C122,Mia Clark,40,M,Midwest
+C123,Rachel Young,22,F,West Coast
+C124,Rachel Allen,24,F,North
+C125,Jack Clark,59,M,Midwest
+C126,Isla Walker,20,M,North
+C127,Nina White,67,F,Midwest
+C128,Xander Carter,42,M,Midwest
+C129,Xander Jones,20,F,North
+C130,Alice King,60,M,Midwest
+C131,Uma Young,43,F,Midwest
+C132,Paul Wright,66,M,North
+C133,Bob Smith,19,M,Midwest
+C134,Yara Hill,36,M,North
+C135,Rachel Young,41,F,West Coast
+C136,Henry Mitchell,54,M,Midwest
+C137,Uma Young,19,M,East Coast
+C138,Sam Parker,18,M,North
+C139,Nina Young,53,M,North
+C140,Wendy Hall,28,F,East Coast
+C141,Mia Smith,43,F,Midwest
+C142,Henry Hill,36,M,Midwest
+C143,Yara Hall,19,F,Midwest
+C144,Karen Allen,56,F,West Coast
+C145,Grace Parker,55,M,North
+C146,Dan Allen,64,M,North
+C147,Karen Hall,66,F,West Coast
+C148,Bob Brown,64,F,South
+C149,Frank Carter,42,F,South
+C150,Wendy Lee,24,M,South
