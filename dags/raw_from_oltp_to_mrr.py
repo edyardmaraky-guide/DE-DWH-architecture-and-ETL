@@ -18,6 +18,7 @@ DEFAULT_ARGS = {
 
 OLTP_CONN_STR = "postgresql://postgres:postgres@oltp_db:5432/oltp"
 MRR_CONN_STR = "postgresql://postgres:postgres@dwh_db:5432/mrr"
+DWH_CONN_STR = "postgresql://postgres:postgres@dwh_db:5432/dwh"
 
 def get_engine(conn_str):
     """Создание SQLAlchemy engine"""
@@ -31,7 +32,7 @@ def get_engine(conn_str):
 def get_high_water_mark(engine, table_name):
     """Получение последней даты загрузки из MRR"""
     
-    query = text("SELECT last_updated FROM mrr_high_water_mark WHERE table_name = :table_name")
+    query = text("SELECT last_updated FROM dwh_high_water_mark WHERE table_name = :table_name")
     with engine.connect() as conn:
         result = conn.execute(query, {"table_name": table_name}).first()
         if result and result[0]:
@@ -44,7 +45,7 @@ def get_high_water_mark(engine, table_name):
 def update_high_water_mark(engine, table_name, max_date):
     """Обновление high water mark в MRR"""
     query = text("""
-        UPDATE mrr_high_water_mark 
+        UPDATE dwh_high_water_mark 
         SET last_updated = :max_date
         WHERE table_name = :table_name
     """)
@@ -61,9 +62,10 @@ def extract_customers():
     # Создаем подключения
     oltp_engine = get_engine(OLTP_CONN_STR)
     mrr_engine = get_engine(MRR_CONN_STR)
+    dwh_engine = get_engine(DWH_CONN_STR)
     
     # Получаем последнюю дату загрузки
-    last_updated = get_high_water_mark(mrr_engine, "customers")
+    last_updated = get_high_water_mark(dwh_engine, "customers")
     logging.info(f"Last updated: {last_updated}")
     
     # Извлекаем данные из OLTP
@@ -102,7 +104,7 @@ def extract_customers():
             
         # Находим максимальную дату для обновления HWM
         max_date = df['updated_at'].max()
-        update_high_water_mark(mrr_engine, "customers", max_date)
+        update_high_water_mark(dwh_engine, "customers", max_date)
         
         logging.info(f"Successfully loaded {rows_processed} customers to MRR")
     else:
@@ -118,9 +120,10 @@ def extract_products():
     # Создаем подключения
     oltp_engine = get_engine(OLTP_CONN_STR)
     mrr_engine = get_engine(MRR_CONN_STR)
+    dwh_engine = get_engine(DWH_CONN_STR)
     
     # Получаем последнюю дату загрузки
-    last_updated = get_high_water_mark(mrr_engine, "products")
+    last_updated = get_high_water_mark(dwh_engine, "products")
     logging.info(f"Last updated: {last_updated}")
     
     # Извлекаем данные из OLTP
@@ -159,7 +162,7 @@ def extract_products():
             
         # Находим максимальную дату для обновления HWM
         max_date = df['updated_at'].max()
-        update_high_water_mark(mrr_engine, "products", max_date)
+        update_high_water_mark(dwh_engine, "products", max_date)
         
         logging.info(f"Successfully loaded {rows_processed} products to MRR")
     else:
@@ -175,9 +178,10 @@ def extract_sales():
     # Создаем подключения
     oltp_engine = get_engine(OLTP_CONN_STR)
     mrr_engine = get_engine(MRR_CONN_STR)
+    dwh_engine = get_engine(DWH_CONN_STR)
     
     # Получаем последнюю дату загрузки
-    last_updated = get_high_water_mark(mrr_engine, "sales")
+    last_updated = get_high_water_mark(dwh_engine, "sales")
     logging.info(f"Last updated: {last_updated}")
     
     # Извлекаем данные из OLTP
@@ -218,7 +222,7 @@ def extract_sales():
             
         # Находим максимальную дату для обновления HWM
         max_date = df['updated_at'].max()
-        update_high_water_mark(mrr_engine, "sales", max_date)
+        update_high_water_mark(dwh_engine, "sales", max_date)
         
         logging.info(f"Successfully loaded {rows_processed} sales to MRR")
     else:
