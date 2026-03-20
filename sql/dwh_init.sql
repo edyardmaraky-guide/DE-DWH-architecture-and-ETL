@@ -6,15 +6,6 @@ CREATE DATABASE dwh;
 -- Подключаемся к mrr и создаем таблицы
 \connect mrr;
 
--- Таблица для high water mark
-CREATE TABLE mrr_high_water_mark (
-    id SERIAL PRIMARY KEY,
-    table_name VARCHAR(50) UNIQUE NOT NULL,
-    last_updated TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 -- MRR таблицы
 CREATE TABLE mrr_dim_customers (
     customer_id INT PRIMARY KEY,
