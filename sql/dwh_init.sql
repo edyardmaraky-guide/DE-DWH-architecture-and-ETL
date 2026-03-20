@@ -50,13 +50,7 @@ CREATE TABLE mrr_fact_sales (
     FOREIGN KEY (product_id) REFERENCES mrr_dim_products(product_id)
 );
 
--- Инициализация HWM в mrr
-INSERT INTO mrr_high_water_mark (table_name, last_updated) 
-VALUES 
-    ('customers', '1900-01-01'),
-    ('products', '1900-01-01'),
-    ('sales', '1900-01-01')
-ON CONFLICT (table_name) DO NOTHING;
+
 
 -- Подключаемся к stg и создаем таблицы
 \connect stg;
@@ -103,9 +97,10 @@ CREATE TABLE dwh_etl_logs (
 -- Таблица high water mark для dwh
 CREATE TABLE dwh_high_water_mark (
     id SERIAL PRIMARY KEY,
-    table_name VARCHAR(100),
+    table_name VARCHAR(50) UNIQUE NOT NULL,
     last_updated TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- DWH таблицы (звездная схема)
@@ -136,4 +131,12 @@ CREATE TABLE dwh_fact_sales (
     revenue DECIMAL(10,2),
     updated_at TIMESTAMP
 );
+
+-- Инициализация HWM в dwh
+INSERT INTO dwh_high_water_mark (table_name, last_updated) 
+VALUES 
+    ('customers', '1900-01-01'),
+    ('products', '1900-01-01'),
+    ('sales', '1900-01-01')
+ON CONFLICT (table_name) DO NOTHING;
 
