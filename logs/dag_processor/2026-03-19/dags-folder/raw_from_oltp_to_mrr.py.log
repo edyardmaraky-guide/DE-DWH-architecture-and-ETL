@@ -1,0 +1,6 @@
+{"timestamp":"2026-03-19T21:04:14.355138Z","level":"info","event":"Filling up the DagBag from /opt/airflow/dags/raw_from_oltp_to_mrr.py","logger":"airflow.models.dagbag.DagBag","filename":"dagbag.py","lineno":593}
+{"timestamp":"2026-03-19T21:04:46.914809Z","level":"info","event":"Filling up the DagBag from /opt/airflow/dags/raw_from_oltp_to_mrr.py","logger":"airflow.models.dagbag.DagBag","filename":"dagbag.py","lineno":593}
+{"timestamp":"2026-03-19T21:05:17.893707Z","level":"info","event":"Filling up the DagBag from /opt/airflow/dags/raw_from_oltp_to_mrr.py","logger":"airflow.models.dagbag.DagBag","filename":"dagbag.py","lineno":593}
+{"timestamp":"2026-03-19T21:05:48.957972Z","level":"info","event":"Filling up the DagBag from /opt/airflow/dags/raw_from_oltp_to_mrr.py","logger":"airflow.models.dagbag.DagBag","filename":"dagbag.py","lineno":593}
+{"timestamp":"2026-03-19T21:06:19.729253Z","level":"info","event":"Filling up the DagBag from /opt/airflow/dags/raw_from_oltp_to_mrr.py","logger":"airflow.models.dagbag.DagBag","filename":"dagbag.py","lineno":593}
+{"timestamp":"2026-03-19T21:06:50.549159Z","level":"info","event":"Filling up the DagBag from /opt/airflow/dags/raw_from_oltp_to_mrr.py","logger":"airflow.models.dagbag.DagBag","filename":"dagbag.py","lineno":593}
