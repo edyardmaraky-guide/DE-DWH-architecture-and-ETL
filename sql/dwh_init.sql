@@ -42,33 +42,48 @@ CREATE TABLE mrr_fact_sales (
 );
 
 
-
 -- Подключаемся к stg и создаем таблицы
 \connect stg;
 
-CREATE TABLE stg_fact_sales (
-    id INT,
-    customer_id INT,
-    product_id INT,
-    qty INT,
-    updated_at TIMESTAMP,
-    etl_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE TABLE stg_dim_customers (
-    id INT PRIMARY KEY,
+    customer_id INT PRIMARY KEY,
     name TEXT,
-    country TEXT,
-    etl_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    age INT,
+    age_group VARCHAR(10),
+    gender VARCHAR(5),
+    region VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE stg_dim_products (
-    id INT PRIMARY KEY,
-    name TEXT,
-    category TEXT,
-    etl_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(20),
+    category VARCHAR(20),
+    supplier_id VARCHAR(20),
+    cost_price DECIMAL(10,2),
+    price_category VARCHAR(20),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE stg_fact_sales (
+    sales_id INT PRIMARY KEY,
+    customer_id INT,
+    product_id INT,
+    dates DATE,
+    quantity INT,
+    price DECIMAL(10,2),
+    discount DECIMAL(10,2),
+    gross_revenue DECIMAL(10,2),
+    net_revenue DECIMAL(10,2),
+    is_discounted BOOLEAN,
+    day_of_week INT2,
+    month_number INT2,
+    year_number INT2,
+    updated_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 -- Подключаемся к dwh и создаем таблицы
 \connect dwh;
 
