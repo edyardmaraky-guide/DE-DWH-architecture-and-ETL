@@ -48,21 +48,16 @@ services:
     environment:
       - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
       - AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL=10
-      # Core
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
 
-      # DB (ВАЖНО)
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@airflow-postgres:5432/airflow
 
-      # Auth
       - AIRFLOW__AUTH__AUTH_MANAGER=simple_auth_manager
 
-      # API / UI
       - AIRFLOW__WEBSERVER__SECRET_KEY=supersecret
       - AIRFLOW__API__SECRET_KEY=supersecret
 
-      # Init
       - _AIRFLOW_DB_MIGRATE=true
 
     ports:
