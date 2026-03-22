@@ -109,35 +109,6 @@ CREATE TABLE dwh_high_water_mark (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- DWH таблицы (звездная схема)
-CREATE TABLE dwh_dim_customers (
-    id INT PRIMARY KEY,
-    name TEXT,
-    country TEXT,
-    valid_from TIMESTAMP,
-    valid_to TIMESTAMP,
-    is_current BOOLEAN DEFAULT TRUE
-);
-
-CREATE TABLE dwh_dim_products (
-    id INT PRIMARY KEY,
-    name TEXT,
-    category TEXT,
-    valid_from TIMESTAMP,
-    valid_to TIMESTAMP,
-    is_current BOOLEAN DEFAULT TRUE
-);
-
-CREATE TABLE dwh_fact_sales (
-    id INT,
-    customer_id INT,
-    product_id INT,
-    qty INT,
-    sale_date DATE,
-    revenue DECIMAL(10,2),
-    updated_at TIMESTAMP
-);
-
 -- Инициализация HWM в dwh
 INSERT INTO dwh_high_water_mark (table_name, last_updated) 
 VALUES 
@@ -145,4 +116,50 @@ VALUES
     ('products', '1900-01-01'),
     ('sales', '1900-01-01')
 ON CONFLICT (table_name) DO NOTHING;
+
+-- DWH таблицы (звездная схема)
+CREATE TABLE dwh_dim_customers (
+    id INT,
+    name TEXT,
+    age INT,
+    age_group VARCHAR(10),
+    gender VARCHAR(5),
+    region TEXT,
+    valid_from TIMESTAMP NOT NULL,
+    valid_to TIMESTAMP,
+    is_current BOOLEAN DEFAULT TRUE,
+    PRIMARY KEY (id, valid_from)
+);
+
+CREATE TABLE dwh_dim_products (
+    id INT,
+    name TEXT,
+    category TEXT,
+    cost_price DECIMAL(10,2),
+    price_category VARCHAR(20),
+    valid_from TIMESTAMP NOT NULL,
+    valid_to TIMESTAMP,
+    is_current BOOLEAN DEFAULT TRUE,
+    PRIMARY KEY (id, valid_from)
+);
+
+CREATE TABLE dwh_fact_sales (
+    sales_id INT PRIMARY KEY,
+    customer_id INT,
+    product_id INT,
+    dates DATE,
+    quantity INT,
+    price DECIMAL(10,2),
+    discount DECIMAL(10,2),
+    gross_revenue DECIMAL(10,2),
+    net_revenue DECIMAL(10,2),
+    is_discounted BOOLEAN,
+    day_of_week INT2,
+    month_number INT2,
+    year_number INT2,
+    updated_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
 
