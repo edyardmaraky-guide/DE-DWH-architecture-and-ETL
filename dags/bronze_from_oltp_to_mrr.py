@@ -132,7 +132,7 @@ def extract_customers():
         return rows_processed
         
     except Exception as e:
-        logging.info(f"Error while establishing connection: {e}")
+        logging.info(f"Error during process:: {e}")
     
         end_time = pendulum.now()
             
@@ -223,7 +223,7 @@ def extract_products():
         return rows_processed
     except Exception as e:
         
-        logging.info(f"Error while establishing connection: {e}")
+        logging.info(f"Error during process: {e}")
     
         end_time = pendulum.now()
             
@@ -318,7 +318,7 @@ def extract_sales():
     
     except Exception as e:
         
-        logging.info(f"Error while establishing connection: {e}")
+        logging.info(f"Error during process:: {e}")
     
         end_time = pendulum.now()
             
