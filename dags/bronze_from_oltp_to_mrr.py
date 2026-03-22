@@ -3,6 +3,7 @@ import pendulum
 import pandas as pd
 from airflow import DAG
 from airflow.sdk import task
+from etl_logs import log_to_db
 from sqlalchemy import create_engine, text
 from airflow.providers.standard.operators.empty import EmptyOperator
 
@@ -57,178 +58,280 @@ def update_high_water_mark(engine, table_name, max_date):
 @task
 def extract_customers():
     """Извлечение клиентов из OLTP в MRR"""
-    logging.info("Starting customers extraction from OLTP to MRR")
     
-    # Создаем подключения
-    oltp_engine = get_engine(OLTP_CONN_STR)
-    mrr_engine = get_engine(MRR_CONN_STR)
-    dwh_engine = get_engine(DWH_CONN_STR)
+    process_name = "oltp_to_mrr"
+    step_name = "customers"
+    start_time = pendulum.now()
     
-    # Получаем последнюю дату загрузки
-    last_updated = get_high_water_mark(dwh_engine, "customers")
-    logging.info(f"Last updated: {last_updated}")
-    
-    # Извлекаем данные из OLTP
-    query = f"""
-        SELECT customer_id, name, age, gender, region, updated_at
-        FROM customers 
-        WHERE updated_at > '{last_updated}'
-        ORDER BY updated_at
-    """
-    
-    df = pd.read_sql(query, oltp_engine)
-    rows_processed = len(df)
-    
-    logging.info(f"Extracted {rows_processed} customers from OLTP")
-    
-    if rows_processed > 0:
-        # Загружаем в MRR
-        with mrr_engine.connect() as conn:
-            # Используем временную таблицу для UPSERT
-            df.to_sql('temp_customers', conn, if_exists='replace', index=False)
-            
-            # UPSERT операция
-            upsert_query = """
-                INSERT INTO mrr_dim_customers (customer_id, name, age, gender, region, updated_at)
-                SELECT customer_id, name, age, gender, region, updated_at
-                FROM temp_customers
-                ON CONFLICT (customer_id) 
-                DO UPDATE SET 
-                    name = EXCLUDED.name,
-                    age = EXCLUDED.age,
-                    gender = EXCLUDED.gender,
-                    region = EXCLUDED.region,
-                    updated_at = EXCLUDED.updated_at
-            """
-            conn.execute(text(upsert_query))
-            
-        # Находим максимальную дату для обновления HWM
-        max_date = df['updated_at'].max()
-        update_high_water_mark(dwh_engine, "customers", max_date)
+    try:
+        logging.info("Starting customers extraction from OLTP to MRR")
         
-        logging.info(f"Successfully loaded {rows_processed} customers to MRR")
-    else:
-        logging.info("No new customers to load")
+        # Создаем подключения
+        oltp_engine = get_engine(OLTP_CONN_STR)
+        mrr_engine = get_engine(MRR_CONN_STR)
+        dwh_engine = get_engine(DWH_CONN_STR)
+        
+        # Получаем последнюю дату загрузки
+        last_updated = get_high_water_mark(dwh_engine, "customers")
+        logging.info(f"Last updated: {last_updated}")
+        
+        # Извлекаем данные из OLTP
+        query = f"""
+            SELECT customer_id, name, age, gender, region, updated_at
+            FROM customers 
+            WHERE updated_at > '{last_updated}'
+            ORDER BY updated_at
+        """
+        
+        df = pd.read_sql(query, oltp_engine)
+        rows_processed = len(df)
+        
+        logging.info(f"Extracted {rows_processed} customers from OLTP")
+        
+        if rows_processed > 0:
+            # Загружаем в MRR
+            with mrr_engine.connect() as conn:
+                # Используем временную таблицу для UPSERT
+                df.to_sql('temp_customers', conn, if_exists='replace', index=False)
+                
+                # UPSERT операция
+                upsert_query = """
+                    INSERT INTO mrr_dim_customers (customer_id, name, age, gender, region, updated_at)
+                    SELECT customer_id, name, age, gender, region, updated_at
+                    FROM temp_customers
+                    ON CONFLICT (customer_id) 
+                    DO UPDATE SET 
+                        name = EXCLUDED.name,
+                        age = EXCLUDED.age,
+                        gender = EXCLUDED.gender,
+                        region = EXCLUDED.region,
+                        updated_at = EXCLUDED.updated_at
+                """
+                conn.execute(text(upsert_query))
+                
+            # Находим максимальную дату для обновления HWM
+            max_date = df['updated_at'].max()
+            update_high_water_mark(dwh_engine, "customers", max_date)
+            
+            logging.info(f"Successfully loaded {rows_processed} customers to MRR")
+        else:
+            logging.info("No new customers to load")
+        
+        end_time = pendulum.now()
+            
+        log_to_db(
+            dwh_engine,
+            process_name,
+            step_name,
+            "success",
+            start_time,
+            end_time,
+            records_processed=len(df)
+        )
+        
+        return rows_processed
+        
+    except Exception as e:
+        logging.info(f"Error while establishing connection: {e}")
     
-    return rows_processed
-
+        end_time = pendulum.now()
+            
+        log_to_db(
+            dwh_engine,
+            process_name,
+            step_name,
+            "failed",
+            start_time,
+            end_time,
+            records_processed=len(df)
+        )
+    
+        
 @task
 def extract_products():
     """Извлечение продуктов из OLTP в MRR"""
+    
+    process_name = "oltp_to_mrr"
+    step_name = "products"
+    start_time = pendulum.now()
+    
     logging.info("Starting products extraction from OLTP to MRR")
-    
-    # Создаем подключения
-    oltp_engine = get_engine(OLTP_CONN_STR)
-    mrr_engine = get_engine(MRR_CONN_STR)
-    dwh_engine = get_engine(DWH_CONN_STR)
-    
-    # Получаем последнюю дату загрузки
-    last_updated = get_high_water_mark(dwh_engine, "products")
-    logging.info(f"Last updated: {last_updated}")
-    
-    # Извлекаем данные из OLTP
-    query = f"""
-        SELECT product_id, product_name, category, supplier_id, cost_price, updated_at
-        FROM products 
-        WHERE updated_at > '{last_updated}'
-        ORDER BY updated_at
-    """
-    
-    df = pd.read_sql(query, oltp_engine)
-    rows_processed = len(df)
-    
-    logging.info(f"Extracted {rows_processed} products from OLTP")
-    
-    if rows_processed > 0:
-        # Загружаем в MRR
-        with mrr_engine.connect() as conn:
-            # Используем временную таблицу для UPSERT
-            df.to_sql('temp_products', conn, if_exists='replace', index=False)
-            
-            # UPSERT операция
-            upsert_query = """
-                INSERT INTO mrr_dim_products (product_id, product_name, category, supplier_id, cost_price, updated_at)
-                SELECT product_id, product_name, category, supplier_id, cost_price, updated_at
-                FROM temp_products
-                ON CONFLICT (product_id) 
-                DO UPDATE SET 
-                    product_name = EXCLUDED.product_name,
-                    category = EXCLUDED.category,
-                    supplier_id = EXCLUDED.supplier_id,
-                    cost_price = EXCLUDED.cost_price,
-                    updated_at = EXCLUDED.updated_at
-            """
-            conn.execute(text(upsert_query))
-            
-        # Находим максимальную дату для обновления HWM
-        max_date = df['updated_at'].max()
-        update_high_water_mark(dwh_engine, "products", max_date)
+    try:
+        # Создаем подключения
+        oltp_engine = get_engine(OLTP_CONN_STR)
+        mrr_engine = get_engine(MRR_CONN_STR)
+        dwh_engine = get_engine(DWH_CONN_STR)
         
-        logging.info(f"Successfully loaded {rows_processed} products to MRR")
-    else:
-        logging.info("No new products to load")
+        # Получаем последнюю дату загрузки
+        last_updated = get_high_water_mark(dwh_engine, "products")
+        logging.info(f"Last updated: {last_updated}")
+        
+        # Извлекаем данные из OLTP
+        query = f"""
+            SELECT product_id, product_name, category, supplier_id, cost_price, updated_at
+            FROM products 
+            WHERE updated_at > '{last_updated}'
+            ORDER BY updated_at
+        """
+        
+        df = pd.read_sql(query, oltp_engine)
+        rows_processed = len(df)
+        
+        logging.info(f"Extracted {rows_processed} products from OLTP")
+        
+        if rows_processed > 0:
+            # Загружаем в MRR
+            with mrr_engine.connect() as conn:
+                # Используем временную таблицу для UPSERT
+                df.to_sql('temp_products', conn, if_exists='replace', index=False)
+                
+                # UPSERT операция
+                upsert_query = """
+                    INSERT INTO mrr_dim_products (product_id, product_name, category, supplier_id, cost_price, updated_at)
+                    SELECT product_id, product_name, category, supplier_id, cost_price, updated_at
+                    FROM temp_products
+                    ON CONFLICT (product_id) 
+                    DO UPDATE SET 
+                        product_name = EXCLUDED.product_name,
+                        category = EXCLUDED.category,
+                        supplier_id = EXCLUDED.supplier_id,
+                        cost_price = EXCLUDED.cost_price,
+                        updated_at = EXCLUDED.updated_at
+                """
+                conn.execute(text(upsert_query))
+                
+            # Находим максимальную дату для обновления HWM
+            max_date = df['updated_at'].max()
+            update_high_water_mark(dwh_engine, "products", max_date)
+            
+            logging.info(f"Successfully loaded {rows_processed} products to MRR")
+        else:
+            logging.info("No new products to load")
+        
+        end_time = pendulum.now()
+            
+        log_to_db(
+            dwh_engine,
+            process_name,
+            step_name,
+            "success",
+            start_time,
+            end_time,
+            records_processed=len(df)
+        )
+        
+        return rows_processed
+    except Exception as e:
+        
+        logging.info(f"Error while establishing connection: {e}")
     
-    return rows_processed
+        end_time = pendulum.now()
+            
+        log_to_db(
+            dwh_engine,
+            process_name,
+            step_name,
+            "failed",
+            start_time,
+            end_time,
+            records_processed=len(df)
+        )
+        
 
 @task
 def extract_sales():
     """Извлечение продаж из OLTP в MRR"""
-    logging.info("Starting sales extraction from OLTP to MRR")
     
-    # Создаем подключения
-    oltp_engine = get_engine(OLTP_CONN_STR)
-    mrr_engine = get_engine(MRR_CONN_STR)
-    dwh_engine = get_engine(DWH_CONN_STR)
+    process_name = "oltp_to_mrr"
+    step_name = "sales"
+    start_time = pendulum.now()
     
-    # Получаем последнюю дату загрузки
-    last_updated = get_high_water_mark(dwh_engine, "sales")
-    logging.info(f"Last updated: {last_updated}")
-    
-    # Извлекаем данные из OLTP
-    query = f"""
-        SELECT sales_id, customer_id, product_id, dates, quantity, price, discount, updated_at
-        FROM sales 
-        WHERE updated_at > '{last_updated}'
-        ORDER BY updated_at
-    """
-    
-    df = pd.read_sql(query, oltp_engine)
-    rows_processed = len(df)
-    
-    logging.info(f"Extracted {rows_processed} sales from OLTP")
-    
-    if rows_processed > 0:
-        # Загружаем в MRR
-        with mrr_engine.connect() as conn:
-            # Используем временную таблицу для UPSERT
-            df.to_sql('temp_sales', conn, if_exists='replace', index=False)
-            
-            # UPSERT операция
-            upsert_query = """
-                INSERT INTO mrr_fact_sales (sales_id, customer_id, product_id, dates, quantity, price, discount, updated_at)
-                SELECT sales_id, customer_id, product_id, dates, quantity, price, discount, updated_at
-                FROM temp_sales
-                ON CONFLICT (sales_id) 
-                DO UPDATE SET 
-                    customer_id = EXCLUDED.customer_id,
-                    product_id = EXCLUDED.product_id,
-                    dates = EXCLUDED.dates,
-                    quantity = EXCLUDED.quantity,
-                    price = EXCLUDED.price,
-                    discount = EXCLUDED.discount,
-                    updated_at = EXCLUDED.updated_at
-            """
-            conn.execute(text(upsert_query))
-            
-        # Находим максимальную дату для обновления HWM
-        max_date = df['updated_at'].max()
-        update_high_water_mark(dwh_engine, "sales", max_date)
+    try:
+        logging.info("Starting sales extraction from OLTP to MRR")
         
-        logging.info(f"Successfully loaded {rows_processed} sales to MRR")
-    else:
-        logging.info("No new sales to load")
+        # Создаем подключения
+        oltp_engine = get_engine(OLTP_CONN_STR)
+        mrr_engine = get_engine(MRR_CONN_STR)
+        dwh_engine = get_engine(DWH_CONN_STR)
+        
+        # Получаем последнюю дату загрузки
+        last_updated = get_high_water_mark(dwh_engine, "sales")
+        logging.info(f"Last updated: {last_updated}")
+        
+        # Извлекаем данные из OLTP
+        query = f"""
+            SELECT sales_id, customer_id, product_id, dates, quantity, price, discount, updated_at
+            FROM sales 
+            WHERE updated_at > '{last_updated}'
+            ORDER BY updated_at
+        """
+        
+        df = pd.read_sql(query, oltp_engine)
+        rows_processed = len(df)
+        
+        logging.info(f"Extracted {rows_processed} sales from OLTP")
+        
+        if rows_processed > 0:
+            # Загружаем в MRR
+            with mrr_engine.connect() as conn:
+                # Используем временную таблицу для UPSERT
+                df.to_sql('temp_sales', conn, if_exists='replace', index=False)
+                
+                # UPSERT операция
+                upsert_query = """
+                    INSERT INTO mrr_fact_sales (sales_id, customer_id, product_id, dates, quantity, price, discount, updated_at)
+                    SELECT sales_id, customer_id, product_id, dates, quantity, price, discount, updated_at
+                    FROM temp_sales
+                    ON CONFLICT (sales_id) 
+                    DO UPDATE SET 
+                        customer_id = EXCLUDED.customer_id,
+                        product_id = EXCLUDED.product_id,
+                        dates = EXCLUDED.dates,
+                        quantity = EXCLUDED.quantity,
+                        price = EXCLUDED.price,
+                        discount = EXCLUDED.discount,
+                        updated_at = EXCLUDED.updated_at
+                """
+                conn.execute(text(upsert_query))
+                
+            # Находим максимальную дату для обновления HWM
+            max_date = df['updated_at'].max()
+            update_high_water_mark(dwh_engine, "sales", max_date)
+            
+            logging.info(f"Successfully loaded {rows_processed} sales to MRR")
+        else:
+            logging.info("No new sales to load")
+        
+        end_time = pendulum.now()
+            
+        log_to_db(
+            dwh_engine,
+            process_name,
+            step_name,
+            "success",
+            start_time,
+            end_time,
+            records_processed=len(df)
+        )
+        
+        return rows_processed
     
-    return rows_processed
+    except Exception as e:
+        
+        logging.info(f"Error while establishing connection: {e}")
+    
+        end_time = pendulum.now()
+            
+        log_to_db(
+            dwh_engine,
+            process_name,
+            step_name,
+            "failed",
+            start_time,
+            end_time,
+            records_processed=len(df)
+        )
+        
 
 with DAG(
     dag_id=DAG_ID,
